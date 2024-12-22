@@ -23,7 +23,7 @@ import SETTINGS from './settings';
 @Injectable()
 export class BookPlugin extends BaseBlockPlugin<typeof SETTINGS> {
   template: PluginBlockTemplate = { name: 'Book Plugin' };
-  private readonly DEFAULT_MODEL = 'google/flan-t5-large';
+  private readonly DEFAULT_MODEL = 'Qwen/Qwen2.5-72B-Instruct';
 
   constructor(pluginService: PluginService) {
     super('book-plugin', pluginService);
@@ -100,7 +100,9 @@ export class BookPlugin extends BaseBlockPlugin<typeof SETTINGS> {
       );
 
       if (!response.ok) {
-        throw new Error(`Failed to get LLM response: ${await response.text()}`);
+        throw new Error(
+          `Failed to get LLM 3alekher response: ${await response.text()}`,
+        );
       }
 
       const result = await response.json();
