@@ -55,10 +55,12 @@ export class BookPlugin extends BaseBlockPlugin<typeof SETTINGS> {
     try {
       const response = await this.fetchFromLLM(llmApiKey, userInput);
 
+      const answer = response.replace(/^(Answer:|Recommendations:)\s*/i, '');
+
       return {
         format: OutgoingMessageFormat.text,
         message: {
-          text: response,
+          text: answer,
         },
       } as StdOutgoingTextEnvelope;
     } catch (error) {
@@ -74,7 +76,7 @@ export class BookPlugin extends BaseBlockPlugin<typeof SETTINGS> {
     userQuery: string,
   ): Promise<string> {
     const bookContext = `You are a knowledgeable assistant specialized in books. 
-    If the query is about book recommendations, suggest relevant books with brief descriptions.
+    If the query is about book recommendations, suggest relevant books with brief descriptions and stop at three recommendations.
     If the query is about a specific book, provide a concise summary and key insights.`;
 
     const input = `Answer based on this context: ${bookContext}\n---\nQuery: ${userQuery}\nAnswer:`;
@@ -105,8 +107,8 @@ export class BookPlugin extends BaseBlockPlugin<typeof SETTINGS> {
         );
       }
 
-      const result = await response.json();
-      return result[0].generated_text;
+      const result: String = (await response.json())[0].generated_text;
+      return result.substring(input.length);
     } catch (e) {
       throw new Error(`Error processing LLM request: ${e.message}`);
     }
